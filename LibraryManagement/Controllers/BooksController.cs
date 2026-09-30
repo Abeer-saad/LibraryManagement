@@ -1,8 +1,9 @@
-
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using LibraryManagement.Models;
 
+[Authorize]
 public class BooksController : Controller
 {
     private readonly ApplicationDbContext _context;
