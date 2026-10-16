@@ -1,34 +1,46 @@
+using LibraryManagement.DTOs;
+using LibraryManagement.Models;
+using LibraryManagement.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using LibraryManagement.Models;
+using LibraryManagement.DTOs;
 [Authorize]
 
 public class CategoriesController : Controller
 {
-    private readonly ApplicationDbContext _context;
 
-    public CategoriesController(ApplicationDbContext context)
+    private readonly ICategoryRepository _repository;
+
+
+
+    public CategoriesController(ICategoryRepository repository)
     {
-        _context = context;
+
+        _repository = repository;
     }
+
+
 
     // GET: CATEGORYS
-    public async Task<IActionResult> Index()    
-    {
-        return View(await _context.Categories.ToListAsync());
-    }
+    public IActionResult Index()
+
+    {  
+        return View(_repository.GetAll());
+
+
+}
 
     // GET: CATEGORYS/Details/5
-    public async Task<IActionResult> Details(int? id)
+
+    public IActionResult Details(int? id)
     {
         if (id == null)
         {
             return NotFound();
         }
 
-        var category = await _context.Categories
-            .FirstOrDefaultAsync(m => m.Id == id);
+        var category = _repository.GetById(id.Value);
         if (category == null)
         {
             return NotFound();
@@ -48,26 +60,29 @@ public class CategoriesController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("Id,Name")] Category category)
+    public IActionResult Create(CategoryDTO category)
     {
         if (ModelState.IsValid)
-        {
-            _context.Add(category);
-            await _context.SaveChangesAsync();
+       {
+            _repository.Add(category);
+            
             return RedirectToAction(nameof(Index));
         }
         return View(category);
     }
 
     // GET: CATEGORYS/Edit/5
-    public async Task<IActionResult> Edit(int? id)
+    
+    public IActionResult Edit(int? id)
     {
+
+    
         if (id == null)
         {
             return NotFound();
         }
 
-        var category = await _context.Categories.FindAsync(id);
+        var category = _repository.GetById(id.Value);
         if (category == null)
         {
             return NotFound();
@@ -80,7 +95,8 @@ public class CategoriesController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int? id, [Bind("Id,Name")] Category category)
+    public IActionResult Edit(int? id, CategoryDTO category)
+
     {
         if (id != category.Id)
         {
@@ -91,8 +107,8 @@ public class CategoriesController : Controller
         {
             try
             {
-                _context.Update(category);
-                await _context.SaveChangesAsync();
+                _repository.Update(category);
+                
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -118,9 +134,7 @@ public class CategoriesController : Controller
             return NotFound();
         }
 
-        var category = await _context.Categories
-            .FirstOrDefaultAsync(m => m.Id == id);
-        if (category == null)
+        var category = _repository.GetById(id.Value); if (category == null)
         {
             return NotFound();
         }
@@ -131,20 +145,25 @@ public class CategoriesController : Controller
     // POST: CATEGORYS/Delete/5
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> DeleteConfirmed(int? id)
+    public IActionResult DeleteConfirmed(int? id)
+
     {
-        var category = await _context.Categories.FindAsync(id);
-        if (category != null)
+
+        if (id == null)
+
         {
-            _context.Categories.Remove(category);
+
+            return NotFound();
+
         }
 
-        await _context.SaveChangesAsync();
+        _repository.Delete(id.Value);
         return RedirectToAction(nameof(Index));
     }
 
     private bool CategoryExists(int? id)
     {
-        return _context.Categories.Any(e => e.Id == id);
+
+        return id.HasValue && _repository.GetById(id.Value) != null;
     }
 }

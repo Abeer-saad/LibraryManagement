@@ -1,21 +1,20 @@
 
 using LibraryManagement.Models;
-
-using Microsoft.EntityFrameworkCore;
-
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-
-using Microsoft.IdentityModel.Tokens;
-
-using System.Text;
-
-
-
+using LibraryManagement.Repositories;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using LibraryManagement.Application;
 
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Services.AddScoped<IBookRepository, BookRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<IBorrowingRepository, BorrowingRepository>();
+builder.Services.AddScoped<IBookService, BookService>();
 
 
 // Add services to the container.

@@ -1,150 +1,171 @@
+using LibraryManagement.DTOs;
+
+using LibraryManagement.Repositories;
+
 using Microsoft.AspNetCore.Authorization;
+
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using LibraryManagement.Models;
-[Authorize]
 
-public class BorrowingsController : Controller
+namespace LibraryManagement.Controllers
+
 {
-    private readonly ApplicationDbContext _context;
 
-    public BorrowingsController(ApplicationDbContext context)
-    {
-        _context = context;
-    }
+    [Authorize]
 
-    // GET: BORROWINGS
-    public async Task<IActionResult> Index()    
-    {
-        return View(await _context.Borrowings.ToListAsync());
-    }
+    public class BorrowingsController : Controller
 
-    // GET: BORROWINGS/Details/5
-    public async Task<IActionResult> Details(int? id)
     {
-        if (id == null)
+
+        private readonly IBorrowingRepository _repository;
+
+        public BorrowingsController(IBorrowingRepository repository)
+
         {
-            return NotFound();
+
+            _repository = repository;
+
         }
 
-        var borrowing = await _context.Borrowings
-            .FirstOrDefaultAsync(m => m.Id == id);
-        if (borrowing == null)
+        public IActionResult Index()
+
         {
-            return NotFound();
+
+            return View(_repository.GetAll());
+
         }
 
-        return View(borrowing);
-    }
+        public IActionResult Details(int? id)
 
-    // GET: BORROWINGS/Create
-    public IActionResult Create()
-    {
-        return View();
-    }
-
-    // POST: BORROWINGS/Create
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("Id,CustomerId,Customer,BookId,Book,BorrowDate,ReturnDate")] Borrowing borrowing)
-    {
-        if (ModelState.IsValid)
         {
-            _context.Add(borrowing);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-        return View(borrowing);
-    }
 
-    // GET: BORROWINGS/Edit/5
-    public async Task<IActionResult> Edit(int? id)
-    {
-        if (id == null)
-        {
-            return NotFound();
+            if (id == null)
+
+                return NotFound();
+
+            var borrowing = _repository.GetById(id.Value);
+
+            if (borrowing == null)
+
+                return NotFound();
+
+            return View(borrowing);
+
         }
 
-        var borrowing = await _context.Borrowings.FindAsync(id);
-        if (borrowing == null)
-        {
-            return NotFound();
-        }
-        return View(borrowing);
-    }
+        public IActionResult Create()
 
-    // POST: BORROWINGS/Edit/5
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int? id, [Bind("Id,CustomerId,Customer,BookId,Book,BorrowDate,ReturnDate")] Borrowing borrowing)
-    {
-        if (id != borrowing.Id)
         {
-            return NotFound();
+
+            return View();
+
         }
 
-        if (ModelState.IsValid)
+        [HttpPost]
+
+        [ValidateAntiForgeryToken]
+
+        public IActionResult Create(BorrowingDTO borrowing)
+
         {
-            try
+
+            if (ModelState.IsValid)
+
             {
-                _context.Update(borrowing);
-                await _context.SaveChangesAsync();
+
+                _repository.Add(borrowing);
+
+                return RedirectToAction(nameof(Index));
+
             }
-            catch (DbUpdateConcurrencyException)
+
+            return View(borrowing);
+
+        }
+
+        public IActionResult Edit(int? id)
+
+        {
+
+            if (id == null)
+
+                return NotFound();
+
+            var borrowing = _repository.GetById(id.Value);
+
+            if (borrowing == null)
+
+                return NotFound();
+
+            return View(borrowing);
+
+        }
+
+        [HttpPost]
+
+        [ValidateAntiForgeryToken]
+
+        public IActionResult Edit(int id, BorrowingDTO borrowing)
+
+        {
+
+            if (id != borrowing.Id)
+
+                return NotFound();
+
+            if (ModelState.IsValid)
+
             {
-                if (!BorrowingExists(borrowing.Id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+
+                _repository.Update(borrowing);
+
+                return RedirectToAction(nameof(Index));
+
             }
+
+            return View(borrowing);
+
+        }
+
+        public IActionResult Delete(int? id)
+
+        {
+
+            if (id == null)
+
+                return NotFound();
+
+            var borrowing = _repository.GetById(id.Value);
+
+            if (borrowing == null)
+
+                return NotFound();
+
+            return View(borrowing);
+
+        }
+
+        [HttpPost, ActionName("Delete")]
+
+        [ValidateAntiForgeryToken]
+
+        public IActionResult DeleteConfirmed(int? id)
+
+        {
+
+            if (id == null)
+
+                return NotFound();
+
+            var borrowing = _repository.GetById(id.Value);
+
+            if (borrowing == null)
+
+                return NotFound();
+
+            _repository.Delete(id.Value);
+
             return RedirectToAction(nameof(Index));
+
         }
-        return View(borrowing);
-    }
-
-    // GET: BORROWINGS/Delete/5
-    public async Task<IActionResult> Delete(int? id)
-    {
-        if (id == null)
-        {
-            return NotFound();
-        }
-
-        var borrowing = await _context.Borrowings
-            .FirstOrDefaultAsync(m => m.Id == id);
-        if (borrowing == null)
-        {
-            return NotFound();
-        }
-
-        return View(borrowing);
-    }
-
-    // POST: BORROWINGS/Delete/5
-    [HttpPost, ActionName("Delete")]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> DeleteConfirmed(int? id)
-    {
-        var borrowing = await _context.Borrowings.FindAsync(id);
-        if (borrowing != null)
-        {
-            _context.Borrowings.Remove(borrowing);
-        }
-
-        await _context.SaveChangesAsync();
-        return RedirectToAction(nameof(Index));
-    }
-
-    private bool BorrowingExists(int? id)
-    {
-        return _context.Borrowings.Any(e => e.Id == id);
     }
 }

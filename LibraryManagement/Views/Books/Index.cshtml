@@ -1,5 +1,4 @@
-@model IEnumerable<LibraryManagement.Models.Book>
-
+@model IEnumerable<LibraryManagement.DTOs.BookDTO>
 @{
     ViewData["Title"] = "Index";
 }
@@ -25,7 +24,7 @@
                 @Html.DisplayNameFor(model => model.CategoryId)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Category)
+                @Html.DisplayNameFor(model => model.CategoryName)
             </th>
             <th></th>
         </tr>
@@ -46,7 +45,7 @@
                 @Html.DisplayFor(model => item.CategoryId)
             </td>
             <td>
-                @Html.DisplayFor(model => item.Category)
+                @Html.DisplayFor(modelItem => item.CategoryName)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |

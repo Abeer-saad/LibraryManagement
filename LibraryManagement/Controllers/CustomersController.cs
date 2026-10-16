@@ -1,150 +1,187 @@
+using LibraryManagement.DTOs;
+
+using LibraryManagement.Repositories;
+
 using Microsoft.AspNetCore.Authorization;
+
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using LibraryManagement.Models;
-[Authorize]
 
-public class CustomersController : Controller
+namespace LibraryManagement.Controllers
+
 {
-    private readonly ApplicationDbContext _context;
 
-    public CustomersController(ApplicationDbContext context)
-    {
-        _context = context;
-    }
+    [Authorize]
 
-    // GET: CUSTOMERS
-    public async Task<IActionResult> Index()    
-    {
-        return View(await _context.Customers.ToListAsync());
-    }
+    public class CustomersController : Controller
 
-    // GET: CUSTOMERS/Details/5
-    public async Task<IActionResult> Details(int? id)
     {
-        if (id == null)
+
+        private readonly ICustomerRepository _repository;
+
+        public CustomersController(ICustomerRepository repository)
+
         {
-            return NotFound();
+
+            _repository = repository;
+
         }
 
-        var customer = await _context.Customers
-            .FirstOrDefaultAsync(m => m.Id == id);
-        if (customer == null)
+        // GET: Customers
+
+        public IActionResult Index()
+
         {
-            return NotFound();
+
+            return View(_repository.GetAll());
+
         }
 
-        return View(customer);
-    }
+        // GET: Customers/Details/5
 
-    // GET: CUSTOMERS/Create
-    public IActionResult Create()
-    {
-        return View();
-    }
+        public IActionResult Details(int? id)
 
-    // POST: CUSTOMERS/Create
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("Id,Name,Email,Phone")] Customer customer)
-    {
-        if (ModelState.IsValid)
         {
-            _context.Add(customer);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-        return View(customer);
-    }
 
-    // GET: CUSTOMERS/Edit/5
-    public async Task<IActionResult> Edit(int? id)
-    {
-        if (id == null)
-        {
-            return NotFound();
+            if (id == null)
+
+                return NotFound();
+
+            var customer = _repository.GetById(id.Value);
+
+            if (customer == null)
+
+                return NotFound();
+
+            return View(customer);
+
         }
 
-        var customer = await _context.Customers.FindAsync(id);
-        if (customer == null)
-        {
-            return NotFound();
-        }
-        return View(customer);
-    }
+        // GET: Customers/Create
 
-    // POST: CUSTOMERS/Edit/5
-    // To protect from overposting attacks, enable the specific properties you want to bind to.
-    // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int? id, [Bind("Id,Name,Email,Phone")] Customer customer)
-    {
-        if (id != customer.Id)
+        public IActionResult Create()
+
         {
-            return NotFound();
+
+            return View();
+
         }
 
-        if (ModelState.IsValid)
+        // POST: Customers/Create
+
+        [HttpPost]
+
+        [ValidateAntiForgeryToken]
+
+        public IActionResult Create(CustomerDTO customer)
+
         {
-            try
+
+            if (ModelState.IsValid)
+
             {
-                _context.Update(customer);
-                await _context.SaveChangesAsync();
+
+                _repository.Add(customer);
+
+                return RedirectToAction(nameof(Index));
+
             }
-            catch (DbUpdateConcurrencyException)
+
+            return View(customer);
+
+        }
+
+        // GET: Customers/Edit/5
+
+        public IActionResult Edit(int? id)
+
+        {
+
+            if (id == null)
+
+                return NotFound();
+
+            var customer = _repository.GetById(id.Value);
+
+            if (customer == null)
+
+                return NotFound();
+
+            return View(customer);
+
+        }
+
+        // POST: Customers/Edit/5
+
+        [HttpPost]
+
+        [ValidateAntiForgeryToken]
+
+        public IActionResult Edit(int id, CustomerDTO customer)
+
+        {
+
+            if (id != customer.Id)
+
+                return NotFound();
+
+            if (ModelState.IsValid)
+
             {
-                if (!CustomerExists(customer.Id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+
+                _repository.Update(customer);
+
+                return RedirectToAction(nameof(Index));
+
             }
+
+            return View(customer);
+
+        }
+
+        // GET: Customers/Delete/5
+
+        public IActionResult Delete(int? id)
+
+        {
+
+            if (id == null)
+
+                return NotFound();
+
+            var customer = _repository.GetById(id.Value);
+
+            if (customer == null)
+
+                return NotFound();
+
+            return View(customer);
+
+        }
+
+        // POST: Customers/Delete/5
+
+        [HttpPost, ActionName("Delete")]
+
+        [ValidateAntiForgeryToken]
+
+        public IActionResult DeleteConfirmed(int? id)
+
+        {
+
+            if (id == null)
+
+                return NotFound();
+
+            var customer = _repository.GetById(id.Value);
+
+            if (customer == null)
+
+                return NotFound();
+
+            _repository.Delete(id.Value);
+
             return RedirectToAction(nameof(Index));
+
         }
-        return View(customer);
-    }
-
-    // GET: CUSTOMERS/Delete/5
-    public async Task<IActionResult> Delete(int? id)
-    {
-        if (id == null)
-        {
-            return NotFound();
-        }
-
-        var customer = await _context.Customers
-            .FirstOrDefaultAsync(m => m.Id == id);
-        if (customer == null)
-        {
-            return NotFound();
-        }
-
-        return View(customer);
-    }
-
-    // POST: CUSTOMERS/Delete/5
-    [HttpPost, ActionName("Delete")]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> DeleteConfirmed(int? id)
-    {
-        var customer = await _context.Customers.FindAsync(id);
-        if (customer != null)
-        {
-            _context.Customers.Remove(customer);
-        }
-
-        await _context.SaveChangesAsync();
-        return RedirectToAction(nameof(Index));
-    }
-
-    private bool CustomerExists(int? id)
-    {
-        return _context.Customers.Any(e => e.Id == id);
     }
 }

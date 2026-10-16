@@ -1,60 +1,58 @@
-@model LibraryManagement.Models.Borrowing
+@model LibraryManagement.DTOs.BorrowingDTO
 
 @{
-    ViewData["Title"] = "Create";
+
+    ViewData["Title"] = "Create Borrowing";
+
 }
 
-<h1>Create</h1>
+<h1>Create Borrowing</h1>
 
-<h4>Borrowing</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<form asp-action="Create" method="post">
 
-            <div class="form-group">
-                <label asp-for="CustomerId" class="control-label"></label>
-                <input asp-for="CustomerId" class="form-control" />
-                <span asp-validation-for="CustomerId" class="text-danger"></span>
-            </div>
+    @Html.AntiForgeryToken()
 
-            <div class="form-group">
-                <label asp-for="Customer" class="control-label"></label>
-                <input asp-for="Customer" class="form-control" />
-                <span asp-validation-for="Customer" class="text-danger"></span>
-            </div>
+    <div asp-validation-summary="ModelOnly"
+         class="text-danger"></div>
 
-            <div class="form-group">
-                <label asp-for="BookId" class="control-label"></label>
-                <input asp-for="BookId" class="form-control" />
-                <span asp-validation-for="BookId" class="text-danger"></span>
-            </div>
+    <div class="mb-3">
 
-            <div class="form-group">
-                <label asp-for="Book" class="control-label"></label>
-                <input asp-for="Book" class="form-control" />
-                <span asp-validation-for="Book" class="text-danger"></span>
-            </div>
+        <label asp-for="CustomerId"></label>
 
-            <div class="form-group">
-                <label asp-for="BorrowDate" class="control-label"></label>
-                <input asp-for="BorrowDate" class="form-control" />
-                <span asp-validation-for="BorrowDate" class="text-danger"></span>
-            </div>
+        <input asp-for="CustomerId" class="form-control" />
 
-            <div class="form-group">
-                <label asp-for="ReturnDate" class="control-label"></label>
-                <input asp-for="ReturnDate" class="form-control" />
-                <span asp-validation-for="ReturnDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+        <span asp-validation-for="CustomerId" class="text-danger"></span>
+
     </div>
-</div>
 
-<div>
+    <div class="mb-3">
+
+        <label asp-for="BookId"></label>
+
+        <input asp-for="BookId" class="form-control" />
+
+        <span asp-validation-for="BookId" class="text-danger"></span>
+
+    </div>
+
+    <div class="mb-3">
+
+        <label asp-for="BorrowDate"></label>
+
+        <input asp-for="BorrowDate" type="date" class="form-control" />
+
+    </div>
+
+    <div class="mb-3">
+
+        <label asp-for="ReturnDate"></label>
+
+        <input asp-for="ReturnDate" type="date" class="form-control" />
+
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create</button>
+
     <a asp-action="Index">Back to List</a>
-</div>
+
+</form>
