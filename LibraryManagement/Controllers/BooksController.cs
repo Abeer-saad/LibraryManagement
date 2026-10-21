@@ -2,8 +2,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using LibraryManagement.Models;
-using LibraryManagement.Repositories;
-using LibraryManagement.DTOs;
+using LibraryManagement.Application.DTOs;
+using LibraryManagement.Infrastructure.Repositories;
 [Authorize]
 public class BooksController : Controller
 {

@@ -1,7 +1,5 @@
-using LibraryManagement.DTOs;
-
-using LibraryManagement.Repositories;
-
+using LibraryManagement.Application.DTOs;
+using LibraryManagement.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authorization;
 
 using Microsoft.AspNetCore.Mvc;

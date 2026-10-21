@@ -7,11 +7,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using LibraryManagement.Application;
+using LibraryManagement.Application.Services;
+using LibraryManagement.Infrastructure.Repositories;
+using LibraryManagement.Servisec.Base;
 
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<IBookRepository, BookRepository>();
-builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<LibraryManagement.Application.Interfaces.IBookRepository, BookRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IBorrowingRepository, BorrowingRepository>();
 builder.Services.AddScoped<IBookService, BookService>();
@@ -69,10 +72,10 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
  });
 
+var conectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContextPool<ApplicationDbContext>(options =>
+    options.UseSqlServer(conectionString));
 
 var app = builder.Build();
 
